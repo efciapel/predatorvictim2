@@ -26,13 +26,75 @@ class MyWindow(wx.Panel):
 
         # A button
         self.button =wx.Button(self, label="OK", pos=(160, 225), style=wx.ID_OK)
-        self.Bind(wx.EVT_BUTTON, self.values, self.button)
+        self.Bind(wx.EVT_BUTTON, self.action, self.button)
 
 
-    def values(self, event):
+    def simulation(self, envi, predators, victims, time):
         data_predator=[]
         data_victim=[]
         data_time=[]
+
+        envi.envi_clear()
+        for i in range(predators):
+            Predator(envi)
+
+        for i in range(victims):
+            Victim(envi)
+
+        envi.observator()
+
+        for k in range(time):
+
+            data_time.append(k)
+            print k
+            data_victim.append(envi.victims)
+            data_predator.append(envi.predators)
+            for i in range(len(envi.envi)):
+                # print "test1"
+                for j in range(len(envi.envi[i])):
+                    # print "test2"
+                    if j % 2 == 0:
+                        if envi.envi[i][j]==2:
+                            if envi.envi[i][j+1] == 1:
+                                envi.predators = envi.predators + 1
+                                envi.victims = envi.victims - 1
+
+                            elif envi.envi[i][j+1] == 0:
+                                envi.victims = envi.victims + 1
+
+                        elif envi.envi[i][j]==1:
+                            if envi.envi[i][j+1] == 0:
+                                envi.predators = envi.predators - 1
+
+                            elif envi.envi[i][j+1]== 1:
+                                envi.predators = envi.predators - 2
+
+                            elif envi.envi[i][j+1] == 2:
+                                envi.predators = envi.predators + 1
+                                envi.victims = envi.victims - 1
+
+                        elif envi.envi[i][j]==0:
+                            if envi.envi[i][j+1] == 1:
+                                envi.predators = envi.predators - 1
+
+                            elif envi.envi[i][j+1] == 2:
+                                envi.victims = envi.victims + 1
+            envi.envi_clear()
+            for i in range(envi.predators):
+                Predator(envi)
+            for i in range(envi.victims):
+                Victim(envi)
+
+        plt.plot(data_time, data_predator, 'b-', label='predator')
+        plt.plot(data_time, data_victim, 'r-', label='victim')
+        plt.xlabel('czas')
+        plt.ylabel('liczba osobnikow')
+        plt.title('Wykres')
+        plt.legend()
+        plt.show()
+
+    def action(self, event):
+
         self.hight=int(self.ehg.GetValue())
         self.width=int(self.ewd.GetValue())
         self.predator=int(self.epr.GetValue())
@@ -46,6 +108,9 @@ class MyWindow(wx.Panel):
             wx.OK | wx.ICON_EXCLAMATION)
 
         else:
+            self.simulation(self.E, self.predator, self.victim, self.time)
+
+'''
             self.E.envi_clear()
             for i in range(self.predator):
                 Predator(self.E)
@@ -55,9 +120,10 @@ class MyWindow(wx.Panel):
 
             self.E.observator()
 
-            for i in range(self.time):
+            for k in range(self.time):
 
-                data_time.append(i)
+                data_time.append(k)
+                print k
                 data_victim.append(self.E.victims)
                 data_predator.append(self.E.predators)
                 for i in range(len(self.E.envi)):
@@ -96,14 +162,15 @@ class MyWindow(wx.Panel):
                 for i in range(self.E.victims):
                     Victim(self.E)
 
-            plt.plot(data_time, data_predator, data_time, data_victim)
+            plt.plot(data_time, data_predator, 'b-', label='predator')
+            plt.plot(data_time, data_victim, 'r-', label='victim')
             plt.xlabel('czas')
             plt.ylabel('liczba osobnikow')
             plt.title('Wykres')
             plt.legend()
             plt.show()
 
-
+'''
  #Rozpoczęcie nowej aplikacji
 Prog = wx.App(0)
 
